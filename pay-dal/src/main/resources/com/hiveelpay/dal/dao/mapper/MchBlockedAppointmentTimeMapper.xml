@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hiveelpay.dal.dao.mapper.MchBlockedAppointmentTimeMapper">
+    <sql id="table_name">
+        t_mch_blocked_appointment_time
+    </sql>
+    <sql id="all_columns">
+        id,
+        accountId, storeId, blockedId, businessType, blockedDateTime,
+        createAt, lastUpdateAt
+    </sql>
+    <sql id="save_columns">
+        accountId, storeId, blockedId, businessType, blockedDateTime
+    </sql>
+    <insert id="saveOne" parameterType="com.hiveelpay.dal.dao.model.MchBlockedAppointmentTime" flushCache="true">
+        insert into
+        <include refid="table_name"/>
+        (
+        <include refid="save_columns"/>
+        )
+        value(
+        #{blockedAppointmentTime.accountId},#{blockedAppointmentTime.storeId},#{blockedAppointmentTime.blockedId},#{blockedAppointmentTime.businessType},#{blockedAppointmentTime.blockedDateTime}
+        )
+    </insert>
+    <insert id="saveMore" flushCache="true">
+        insert into
+        <include refid="table_name"/>
+        (
+        <include refid="save_columns"/>
+        )
+        values
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.accountId},#{item.storeId},#{item.blockedId},#{item.businessType},#{item.blockedDateTime}
+            )
+        </foreach>
+    </insert>
+    <delete id="deleteByDate" flushCache="true">
+        delete from
+        <include refid="table_name"/>
+        <where>
+            accountId = #{accountId}
+            <if test="storeId !=null and storeId != ''">
+                and storeId = #{storeId}
+            </if>
+            <if test="dateStr !=null and dateStr!=''">
+                and date_format(blockedDateTime,'%m%d%Y') = #{dateStr}
+            </if>
+        </where>
+    </delete>
+    <delete id="deleteBlockedDate" parameterType="com.hiveelpay.dal.dao.model.MchBlockedAppointmentTime"
+            flushCache="true">
+        delete from
+        <include refid="table_name"/>
+        <where>
+            storeId = #{item.storeId}
+            <if test="item.accountId != null and item.accountId != ''">
+                and accountId = #{item.accountId}
+            </if>
+            <if test="item.businessType != null">
+                and businessType = #{item.businessType}
+            </if>
+            <if test="item.blockedDateTime != null ">
+                and blockedDateTime = #{item.blockedDateTime}
+            </if>
+        </where>
+    </delete>
+    <select id="findBlockedTimes" resultType="com.hiveelpay.dal.dao.model.MchBlockedAppointmentTime" useCache="false">
+        select
+        <include refid="all_columns"/>
+        from
+        <include refid="table_name"/>
+        <where>
+            1=1
+            <if test="accountId !=null and accountId !=''">
+                and accountId = #{accountId}
+            </if>
+            <if test="storeId !=null and  storeId != ''">
+                and storeId = #{storeId}
+            </if>
+            <if test="dateStr!=null and dateStr != ''">
+                and date_format(blockedDateTime,'%m%Y') = #{dateStr}
+            </if>
+            <if test="dayStr !=null and dayStr != ''">
+                and date_format(blockedDateTime,'%d') = #{dayStr}
+            </if>
+            <if test="businessType != null">
+                and businessType = #{businessType}
+            </if>
+        </where>
+    </select>
+    <select id="findBlockedTime" resultType="com.hiveelpay.dal.dao.model.MchBlockedAppointmentTime" flushCache="true">
+        select
+        <include refid="all_columns"/>
+        from
+        <include refid="table_name"/>
+        <where>
+            storeId = #{storeId} and date_format(blockedDateTime,'%m%d%Y%h%i') = #{dateStr}
+        </where>
+    </select>
+
+</mapper>

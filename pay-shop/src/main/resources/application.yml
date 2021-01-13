@@ -1,0 +1,8 @@
+#---------------------------------#
+#        General configuration    #
+#---------------------------------#
+spring:
+  profiles:
+    active: local
+  application:
+    name: hiveel_pay_shop

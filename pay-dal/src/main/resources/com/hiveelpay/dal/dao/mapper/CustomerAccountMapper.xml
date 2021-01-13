@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hiveelpay.dal.dao.mapper.CustomerAccountMapper">
+    <sql id="table_name">
+        t_customer_account
+    </sql>
+    <sql id="all_columns">
+        id, userId, customerId, firstName, lastName, company, email, fax, phone, website,
+        accountType, ssn, dateOfBirth, legalName, dbaName, taxId, merchantStatus, syncStatus, targetId,
+        createAt, lastUpdateAt
+    </sql>
+
+    <sql id="save_columns">
+        userId, customerId, firstName, lastName, company, email, fax, phone, website,
+        accountType, ssn, dateOfBirth, legalName, dbaName, taxId, merchantStatus, targetId
+    </sql>
+    <insert id="save" parameterType="com.hiveelpay.dal.dao.model.CustomerAccount" flushCache="true">
+        insert into
+        <include refid="table_name"/>
+        (
+        <include refid="save_columns"/>
+        )
+        value
+        (
+        #{customerAccount.userId},
+        #{customerAccount.customerId}, #{customerAccount.firstName}, #{customerAccount.lastName},
+        #{customerAccount.company}, #{customerAccount.email}, #{customerAccount.fax}, #{customerAccount.phone},
+        #{customerAccount.website},#{customerAccount.accountType}, #{customerAccount.ssn},
+        #{customerAccount.dateOfBirth},
+        #{customerAccount.legalName}, #{customerAccount.dbaName}, #{customerAccount.taxId},
+        #{customerAccount.merchantStatus},#{customerAccount.targetId}
+        )
+    </insert>
+    <update id="updateCustomerAccount" flushCache="true" parameterType="com.hiveelpay.dal.dao.model.CustomerAccount">
+        update
+        <include refid="table_name"/>
+        <set>
+            <if test="customerAccount.firstName != null and customerAccount.firstName != ''">
+                firstName=#{customerAccount.firstName},
+            </if>
+            <if test="customerAccount.lastName !=null and customerAccount.lastName != ''">
+                lastName = #{customerAccount.lastName},
+            </if>
+            <if test="customerAccount.company !=null and customerAccount.company != ''">
+                company = #{customerAccount.company},
+            </if>
+            <if test="customerAccount.email !=null and customerAccount.email != ''">
+                email = #{customerAccount.email},
+            </if>
+            <if test="customerAccount.fax !=null and customerAccount.fax != ''">
+                fax = #{customerAccount.fax},
+            </if>
+            <if test="customerAccount.phone !=null and customerAccount.phone != ''">
+                phone = #{customerAccount.phone},
+            </if>
+            <if test="customerAccount.website !=null and customerAccount.website != ''">
+                website = #{customerAccount.website},
+            </if>
+            <if test="customerAccount.ssn !=null and customerAccount.ssn != ''">
+                ssn = #{customerAccount.ssn},
+            </if>
+            <if test="customerAccount.dateOfBirth !=null and customerAccount.dateOfBirth != ''">
+                dateOfBirth = #{customerAccount.dateOfBirth},
+            </if>
+            <if test="customerAccount.legalName !=null and customerAccount.legalName != ''">
+                legalName = #{customerAccount.legalName},
+            </if>
+            <if test="customerAccount.dbaName !=null and customerAccount.dbaName != ''">
+                dbaName = #{customerAccount.dbaName},
+            </if>
+            <if test="customerAccount.taxId !=null and customerAccount.taxId != ''">
+                taxId = #{customerAccount.taxId},
+            </if>
+            <if test="customerAccount.merchantStatus !=null ">
+                merchantStatus = #{customerAccount.merchantStatus},
+            </if>
+            <if test="customerAccount.syncStatus !=null ">
+                syncStatus = #{customerAccount.syncStatus},
+            </if>
+            <if test="customerAccount.targetId !=null  and customerAccount.targetId != ''">
+                targetId = #{customerAccount.targetId}
+            </if>
+        </set>
+        <where>
+            userId = #{customerAccount.userId}
+            <if test="customerAccount.id !=null">
+                and id = #{customerAccount.id}
+            </if>
+            <if test="customerAccount.customerId !=null">
+                and customerId = #{customerAccount.customerId}
+            </if>
+        </where>
+    </update>
+    <select id="findByUserId" resultType="com.hiveelpay.dal.dao.model.CustomerAccount" useCache="true">
+        select
+        <include refid="all_columns"/>
+        from
+        <include refid="table_name"/>
+        where userId = #{userId}
+    </select>
+    <select id="findCustomerIdbyUserId" resultType="string" useCache="false">
+        select customerId from
+        <include refid="table_name"/>
+        <where>
+            userId = #{userId}
+        </where>
+    </select>
+
+</mapper>

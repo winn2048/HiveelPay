@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hiveelpay.dal.dao.mapper.PaySubscriptionMapper">
+    <sql id="table_name">
+        t_pay_subscription
+    </sql>
+    <sql id="all_columns">
+        <![CDATA[
+        id,
+        bizOrderNo, subscriptionId, planId, paymentMethodId, amount, status, errorMsg, subReqCount,
+        createAt, lastUpdateAt
+        ]]>
+    </sql>
+    <sql id="save_columns">
+        <![CDATA[
+        bizOrderNo, subscriptionId, planId, paymentMethodId, amount, status
+        ]]>
+    </sql>
+    <insert id="save" parameterType="com.hiveelpay.dal.dao.model.PaySubscription" flushCache="true">
+        insert into
+        <include refid="table_name"/>
+        (
+        <include refid="save_columns"/>
+        )value
+        (
+        #{paySubscription.bizOrderNo},
+        #{paySubscription.subscriptionId},
+        #{paySubscription.planId},
+        #{paySubscription.paymentMethodId},
+        #{paySubscription.amount},
+        #{paySubscription.status}
+        )
+    </insert>
+    <update id="updateStatusBySubscriptionId">
+        update
+        <include refid="table_name"/>
+        <set>
+            <![CDATA[   status = #{statusName} , subReqCount = subReqCount + 1 ]]>
+        </set>
+        <where>
+            subscriptionId = #{subscriptionId}
+        </where>
+    </update>
+    <update id="updateErrorMsg" flushCache="true">
+        update
+        <include refid="table_name"/>
+        <set>
+            <if test="statusName!=null and statusName != '' ">
+                <![CDATA[   status = #{statusName} ,   ]]>
+            </if>
+            <if test="errorMsg != null and errorMsg != ''">
+                errorMsg = #{errorMsg},
+            </if>
+            subReqCount = subReqCount + 1
+        </set>
+        <where>
+            subscriptionId = #{subscriptionId}
+        </where>
+    </update>
+    <select id="getAfter10MinutesSubReqs" resultType="com.hiveelpay.dal.dao.model.PaySubscription" useCache="false">
+        select
+        <include refid="all_columns"/>
+        from
+        <include refid="table_name"/>
+        <where>
+            <![CDATA[ status = #{statusName} and subReqCount < #{subReqCount}  and date_add(createAt, interval 10 minute) < now()  ]]>
+        </where>
+        order by createAt ASC
+    </select>
+    <select id="findBySubscriptionId" resultType="com.hiveelpay.dal.dao.model.PaySubscription" useCache="true">
+        select
+        <include refid="all_columns"/>
+        from
+        <include refid="table_name"/>
+        <where>
+            subscriptionId = #{sId}
+        </where>
+    </select>
+    <select id="findByBizOrderNo" resultType="com.hiveelpay.dal.dao.model.PaySubscription">
+        select
+        <include refid="all_columns"/>
+        from
+        <include refid="table_name"/>
+        <where>
+            bizOrderNo = #{bizOrderNo}
+        </where>
+    </select>
+</mapper>

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hiveelpay.dal.dao.mapper.InvoiceMapper">
+    <sql id="table_name">
+        t_invoice
+    </sql>
+    <sql id="all_columns">
+        id,
+        invoiceId, mchId, dateFrom, dateTo, settledDate, invoiceStatus, invoiceAmount, settledAmount, commissionAmount, totalRecords, remark, createAt, lastUpdateAt
+    </sql>
+    <sql id="save_columns">
+        invoiceId, mchId, dateFrom, dateTo, invoiceStatus, invoiceAmount, settledAmount, commissionAmount, totalRecords, remark
+    </sql>
+    <insert id="saveOne" parameterType="com.hiveelpay.dal.dao.model.Invoice" flushCache="true">
+        insert into
+        <include refid="table_name"/>
+        (
+        <include refid="save_columns"/>
+        )value(
+        #{invoice.invoiceId}, #{invoice.mchId}, #{invoice.dateFrom}, #{invoice.dateTo},
+        #{invoice.invoiceStatus},#{invoice.invoiceAmount},#{invoice.settledAmount},#{invoice.commissionAmount},#{invoice.totalRecords},
+        #{invoice.remark}
+        )
+    </insert>
+    <update id="updateInvoice" flushCache="true">
+        update
+        <include refid="table_name"/>
+        <set>
+            <if test="invoice.settledAmount != null">
+                settledAmount=#{invoice.settledAmount}
+            </if>
+            <if test="invoice.settledDate != null">
+                ,settledDate = #{invoice.settledDate}
+            </if>
+            <if test="invoice.invoiceStatus != null">
+                ,invoiceStatus = #{invoice.invoiceStatus}
+            </if>
+            <if test="invoice.remark != null and invoice.remark != ''">
+                ,remark = #{invoice.remark}
+            </if>
+        </set>
+        <where>
+            invoiceId = #{invoice.invoiceId} and invoiceStatus = #{preStatus}
+        </where>
+    </update>
+    <select id="countInvoice" resultType="_int" useCache="true">
+        select count(id)
+        from
+        <include refid="table_name"/>
+        <where>
+            mchId = #{mchId}
+            <![CDATA[   and str_to_date(#{startDateStr},'%m%d%Y%H%i') >=  dateFrom  ]]>
+            <![CDATA[   and str_to_date(#{endDateStr},'%m%d%Y%H%i') <=  dateTo  ]]>
+        </where>
+    </select>
+    <select id="searchCount" resultType="_int" useCache="true">
+        select count(id)
+        from
+        <include refid="table_name"/>
+        <where>
+            mchId = #{searchRequest.mchId}
+            <if test="searchRequest.invoiceStatus != null">
+                and invoiceStatus = #{searchRequest.invoiceStatus}
+            </if>
+        </where>
+    </select>
+    <select id="searchInvoice" resultType="com.hiveelpay.dal.dao.model.Invoice" useCache="true">
+        select
+        <include refid="all_columns"/>
+        from
+        <include refid="table_name"/>
+        <where>
+            mchId = #{searchRequest.mchId}
+            <if test="searchRequest.invoiceStatus != null">
+                and invoiceStatus = #{searchRequest.invoiceStatus}
+            </if>
+        </where>
+        order by invoiceStatus asc, createAt desc
+        <if test="page!=null">
+            limit #{page.offset}, #{page.perPageSize}
+        </if>
+    </select>
+    <select id="queryByInvoiceId" resultType="com.hiveelpay.dal.dao.model.Invoice" useCache="true">
+        select
+        <include refid="all_columns"/>
+        from
+        <include refid="table_name"/>
+        <where>
+            invoiceId = #{invoiceId}
+        </where>
+    </select>
+</mapper>

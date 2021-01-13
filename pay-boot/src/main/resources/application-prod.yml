@@ -1,0 +1,75 @@
+#---------------------------------#
+#  hiveelpay prod configuration   #
+#---------------------------------#
+server:
+  port: 8080
+spring:
+  profiles:
+    include:
+    - activeMQ
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://haproxy:23306/pay?useUnicode=true&characterEncoding=utf-8&autoReconnect=true&useSSL=false
+    #&serverTimezone=America/Los_Angeles
+    username: hiveel
+    password: hiveel.com1129
+    hikari:
+      pool-name: hiveelpay_prod
+      minimum-idle: 5
+      maximum-pool-size: 80
+      connection-timeout: 300000
+      allow-pool-suspension: true
+      auto-commit: true
+      connection-test-query: select 1
+  activemq:
+    broker-url: failover:(tcp://activemq:61616?wireFormat.maxInactivityDuration=0)
+    in-memory: true
+    pool:
+      enabled: true # 如果此处设置为true，需要加activemq-pool依赖包，否则会自动配置失败，报JmsMessagingTemplate注入失败
+  thymeleaf:
+    encoding: UTF-8
+  devtools:
+    restart:
+      enabled: true
+  jackson:
+    date-format: "MMddyyyyHHmmss"
+mybatis:
+  mapper-locations: "classpath:com/hiveelpay/dal/dao/mapper/*Mapper.xml"
+  type-handlers-package: com.hiveelpay.dal.dao.typehandlers
+  configuration:
+    cache-enabled: false
+    default-fetch-size: 500
+    default-enum-type-handler: org.apache.ibatis.type.EnumTypeHandler
+config:
+  ali:
+    notify_url: http://api.pay.org/notify/pay/aliPayNotifyRes.htm
+    return_url: http://pay.hiveel.com
+  wx:
+    certRootPath: /home/pay/service/cert
+    notifyUrl: http://api.pay.org/notify/pay/wxPayNotifyRes.htm
+  hiveel:
+    pay-server-base-url: "http://hiveelpay:8080/api"
+  search:
+    carUpdate: "http://hiveelsearch:8080/car/update/service/_carId"
+  auth:
+    #调用getUsers查询用户
+    apiUserInfo: "http://hiveelauthserver:8080/auth/getUsers?ids="
+  email:
+    switchOn: true
+    api: "http://hiveel3:8080/api/email"
+    errorApi: "http://hiveel3:8080/api/error/email"
+    apiKey: "hiveel"
+    appointmentViewUrl: "http://www.hiveel.com/account/order/_bizType_/_appointmentId_"
+  braintree:
+    btEnvironment: "production"
+    btMerchantId: "zqj6wqkgcrbfdnv4"
+    btPublicKey: "dr5mjj4zc9g3sr86"
+    btPrivateKey: "8a6e7053404c0b710de378db833f26bc"
+  admin:
+    contacts: "Iris:4159968517,Wilson:9099908811,Lee:6508669332"
+
+
+logging:
+  file: /tmp/log/hiveelpay.log
+  config: classpath:logback-spring.xml
+debug: true

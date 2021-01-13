@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hiveelpay.dal.dao.mapper.PayProductMapper">
+    <sql id="all_columns">
+        id, productId, productName, quantity, amount, productDescription, productType, productStatus, serviceLength, serviceLengthUnit, supportAutoPay, btPlanId, createAt, lastUpdateAt
+    </sql>
+    <sql id="insert_columns">
+        (productId, productName, quantity, amount, productDescription, productType, serviceLength, serviceLengthUnit, supportAutoPay, btPlanId)
+    </sql>
+    <sql id="table_name">
+        t_pay_product
+    </sql>
+
+    <insert id="save" parameterType="com.hiveelpay.dal.dao.model.PayProduct" flushCache="true">
+        INSERT INTO
+        <include refid="table_name"/>
+        <include refid="insert_columns"/>
+        VALUE
+        (
+        #{product.productId},#{product.productName},#{product.quantity},#{product.amount},#{product.productDescription},#{product.productType},
+        #{product.serviceLength},#{product.serviceLengthUnit},#{product.supportAutoPay},#{product.btPlanId}
+        )
+    </insert>
+    <update id="updatePryProduct" flushCache="true" parameterType="com.hiveelpay.dal.dao.model.PayProduct">
+        update
+        <include refid="table_name"/>
+        <set>
+            <if test="product.productName != null">
+                productName=#{product.productName},
+            </if>
+            <if test="product.quantity != null ">
+                quantity=#{product.quantity},
+            </if>
+            <if test="product.amount != null">
+                amount=#{product.amount},
+            </if>
+            <if test="product.productDescription != null and product.productDescription !=''">
+                productDescription=#{product.productDescription},
+            </if>
+            <if test="product.productType != null">
+                productType=#{product.productType},
+            </if>
+            <if test="product.productStatus != null">
+                productStatus=#{product.productStatus},
+            </if>
+            <if test="product.serviceLength != null and product.serviceLength !='' ">
+                serviceLength=#{product.serviceLength},
+            </if>
+            <if test="product.serviceLengthUnit != null">
+                serviceLengthUnit=#{product.serviceLengthUnit},
+            </if>
+            <if test="product.btPlanId != null and product.btPlanId !=''">
+                btPlanId=#{product.btPlanId},
+            </if>
+            supportAutoPay = #{product.supportAutoPay}
+        </set>
+        <where>
+            productId=#{product.productId}
+        </where>
+    </update>
+    <delete id="deleteByProductId" parameterType="string" flushCache="true">
+        delete from
+        <include refid="table_name"/>
+        where productId=#{productId}
+    </delete>
+    <select id="findList" resultType="com.hiveelpay.dal.dao.model.PayProduct" useCache="true" parameterType="int">
+        SELECT
+        <include refid="all_columns"/>
+        FROM
+        <include refid="table_name"/>
+        ORDER BY createAt DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+    <select id="findByProductId" resultType="com.hiveelpay.dal.dao.model.PayProduct" useCache="true" parameterType="string">
+        select
+        <include refid="all_columns"/>
+        from
+        <include refid="table_name"/>
+        <where>
+            productId = #{payProductId}
+        </where>
+    </select>
+    <select id="count" resultType="_int">
+        select count(id) from
+        <include refid="table_name"/>
+    </select>
+    <select id="findByType" resultType="com.hiveelpay.dal.dao.model.PayProduct" useCache="true">
+        select
+        <include refid="all_columns"/>
+        from
+        <include refid="table_name"/>
+        <where>
+            productType = #{payProductType} and productStatus = #{payProductStatus}
+        </where>
+        order by amount ASC
+    </select>
+    <select id="findAllSellingProducts" resultType="com.hiveelpay.dal.dao.model.PayProduct">
+        select
+        <include refid="all_columns"/>
+        from
+        <include refid="table_name"/>
+        <where>
+            productStatus =#{selling}
+        </where>
+    </select>
+</mapper>

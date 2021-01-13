@@ -1,0 +1,431 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hiveelpay.dal.dao.mapper.AppointmentDocMapper">
+    <sql id="table_name">
+        t_appointment_doc
+    </sql>
+    <sql id="all_columns">
+        <![CDATA[
+        id,
+        customerId, bizOrderNo, appointmentId, invoiceId, toMchId, toStoreId, firstName, lastName, appointmentTime, appointmentStatus, businessType,appointmentType, email, phoneNumber, vin, plateState, year
+        , make, model, mileage, previousOfferPrice, titleStatus, companyName, whereCarAndKey, carMaxImgUrl, quotePrice, remark,
+        street, apt, city, state, zipcode, engineType,
+        createAt, lastUpdateAt
+        ]]>
+    </sql>
+    <sql id="save_columns">
+        <![CDATA[
+        customerId, bizOrderNo, appointmentId, invoiceId, toMchId, toStoreId, firstName, lastName, appointmentTime, appointmentStatus, businessType,appointmentType, email, phoneNumber, vin, plateState, year
+        , make, model, mileage, previousOfferPrice, titleStatus, companyName, whereCarAndKey, carMaxImgUrl, quotePrice, remark, street, apt, city, state, zipcode, engineType
+        ]]>
+    </sql>
+    <insert id="save" parameterType="com.hiveelpay.dal.dao.model.AppointmentDoc" flushCache="true">
+        INSERT INTO
+        <include refid="table_name"/>
+        (
+        <include refid="save_columns"/>
+        )VALUE
+        (
+        #{ad.customerId}, #{ad.bizOrderNo},#{ad.appointmentId},#{ad.invoiceId}, #{ad.toMchId}, #{ad.toStoreId},
+        #{ad.firstName},
+        #{ad.lastName},
+        #{ad.appointmentTime},
+        #{ad.appointmentStatus},#{ad.businessType},#{ad.appointmentType}, #{ad.email},
+        #{ad.phoneNumber},#{ad.vin}, #{ad.plateState}, #{ad.year}, #{ad.make}, #{ad.model}, #{ad.mileage},
+        #{ad.previousOfferPrice},
+        #{ad.titleStatus},#{ad.companyName},#{ad.whereCarAndKey},#{ad.carMaxImgUrl},#{ad.quotePrice},#{ad.remark},
+        #{ad.street},#{ad.apt},#{ad.city},#{ad.state},#{ad.zipcode},#{ad.engineType}
+        )
+    </insert>
+    <update id="updateAndAssociateBizOrderNo" flushCache="true">
+        UPDATE
+        <include refid="table_name"/>
+        <set>
+            bizOrderNo = #{bizOrderNo}
+        </set>
+        <where>
+            appointmentId =#{docId} AND (bizOrderNo IS NULL OR bizOrderNo='') and appointmentStatus = #{status}
+        </where>
+    </update>
+    <update id="updateStatus" flushCache="true">
+        UPDATE
+        <include refid="table_name"/>
+        <set>
+            appointmentStatus = #{toStatus}
+        </set>
+        <where>
+            appointmentId = #{docId} and appointmentStatus = #{fromStatus}
+        </where>
+    </update>
+    <update id="associateInvoiceId">
+        UPDATE
+        <include refid="table_name"/>
+        <set>
+            invoiceId = #{invoiceId}
+        </set>
+        <where>
+            appointmentId in (
+            <foreach collection="appointmentIds" item="item" separator=",">
+                #{item}
+            </foreach>
+            )
+        </where>
+    </update>
+    <update id="updateAppointment" parameterType="com.hiveelpay.dal.dao.model.AppointmentDoc" flushCache="true">
+        UPDATE
+        <include refid="table_name"/>
+        <set>
+            <![CDATA[
+            firstName =#{appointmentDoc.firstName},
+            lastName =#{appointmentDoc.lastName},
+            appointmentTime =#{appointmentDoc.appointmentTime},
+            appointmentStatus =#{appointmentDoc.appointmentStatus},
+            businessType =#{appointmentDoc.businessType},
+            email =#{appointmentDoc.email},
+            phoneNumber =#{appointmentDoc.phoneNumber},
+            vin =#{appointmentDoc.vin},
+            plateState =#{appointmentDoc.plateState},
+            year =#{appointmentDoc.year},
+            make =#{appointmentDoc.make},
+            model =#{appointmentDoc.model},
+            mileage =#{appointmentDoc.mileage},
+            previousOfferPrice =#{appointmentDoc.previousOfferPrice},
+            titleStatus =#{appointmentDoc.titleStatus},
+            companyName =#{appointmentDoc.companyName},
+            whereCarAndKey =#{appointmentDoc.whereCarAndKey},
+            remark =#{appointmentDoc.remark},
+            street =#{appointmentDoc.street},
+            apt =#{appointmentDoc.apt},
+            carMaxImgUrl =#{appointmentDoc.carMaxImgUrl},
+            city =#{appointmentDoc.city},
+            state =#{appointmentDoc.state},
+            zipcode =#{appointmentDoc.zipcode},
+            engineType=#{appointmentDoc.engineType}
+         ]]>
+        </set>
+        <where>
+            appointmentId = #{appointmentDoc.appointmentId}
+        </where>
+    </update>
+    <update id="quoteAppt" flushCache="true">
+        update
+        <include refid="table_name"/>
+        <set>
+            quotePrice=#{quotePrice}
+        </set>
+        <where>
+            appointmentId=#{appointmentId}
+        </where>
+    </update>
+    <select id="countUserAppointments" resultType="_int" useCache="false">
+        SELECT count(id)
+        FROM
+        <include refid="table_name"/>
+        <where>
+            customerId = #{userId}
+            <if test="appointmentStatus !=null">
+                appointmentStatus = #{appointmentStatus}
+            </if>
+        </where>
+    </select>
+    <select id="findUserAppointments" resultType="com.hiveelpay.dal.dao.model.AppointmentDoc" useCache="true">
+        SELECT
+        <include refid="all_columns"/>
+        FROM
+        <include refid="table_name"/>
+        <where>
+            customerId = #{userId}
+            <if test="appointmentStatus !=null">
+                appointmentStatus = #{appointmentStatus}
+            </if>
+        </where>
+        ORDER BY createAt DESC
+        <if test="page!=null">
+            LIMIT #{page.offset}, #{page.perPageSize}
+        </if>
+    </select>
+    <select id="findUserAppointment" resultType="com.hiveelpay.dal.dao.model.AppointmentDoc" useCache="true" fetchSize="100">
+        select
+        <include refid="all_columns"/>
+        from
+        <include refid="table_name"/>
+        <where>
+            customerId = #{userId} and appointmentId = #{appointmentId}
+        </where>
+    </select>
+    <select id="countMchAppointment" resultType="int" useCache="false">
+        SELECT count(id)
+        FROM
+        <include refid="table_name"/>
+        <where>
+            toMchId = #{mchId}
+            <if test="storeId != null and storeId != ''">
+                and toStoreId = #{storeId}
+            </if>
+            <if test="businessType != null">
+                and businessType = #{businessType}
+            </if>
+            <if test="tradeinType !=null and tradeinType.val eq 1">
+                and (carMaxImgUrl is  null or carMaxImgUrl ='')
+            </if>
+            <if test="tradeinType !=null and tradeinType.val eq 2">
+                and carMaxImgUrl is not null and carMaxImgUrl !=''
+            </if>
+            <if test="statusSet !=null">
+                and appointmentStatus in (
+                <foreach collection="statusSet" item="item" separator=",">
+                    #{item}
+                </foreach>
+                )
+            </if>
+        </where>
+    </select>
+    <select id="findMchAppointments" resultType="com.hiveelpay.dal.dao.model.AppointmentDoc" useCache="true" fetchSize="100">
+        SELECT
+        <include refid="all_columns"/>
+        FROM
+        <include refid="table_name"/>
+        <where>
+            toMchId = #{mchId}
+            <if test="storeId != null and storeId != ''">
+                and toStoreId = #{storeId}
+            </if>
+            <if test="businessType != null">
+                and businessType = #{businessType}
+            </if>
+            <if test="tradeinType !=null and tradeinType.val eq 1">
+                and (carMaxImgUrl is  null or carMaxImgUrl ='')
+            </if>
+            <if test="tradeinType !=null and tradeinType.val eq 2">
+                and carMaxImgUrl is not null  and carMaxImgUrl !=''
+            </if>
+            <if test="statusSet !=null">
+                and appointmentStatus in (
+                <foreach collection="statusSet" item="item" separator=",">
+                    #{item}
+                </foreach>
+                )
+            </if>
+        </where>
+        order by appointmentTime desc , createAt desc
+        limit #{page.offset}, #{page.perPageSize}
+    </select>
+    <select id="findAppointmentForMch" resultType="com.hiveelpay.dal.dao.model.AppointmentDoc">
+        SELECT
+        <include refid="all_columns"/>
+        FROM
+        <include refid="table_name"/>
+        <where>
+            appointmentId = #{appointmentId} and toMchId = #{mchId}
+        </where>
+    </select>
+    <select id="countAppointmentsWithDateStr" resultType="_int">
+        SELECT count(id)
+        FROM
+        <include refid="table_name"/>
+        <where>
+            toStoreId = #{storeId}
+
+            <if test="statusSet !=null">
+                and appointmentStatus in (
+                <foreach collection="statusSet" item="item" separator=",">
+                    #{item}
+                </foreach>
+                )
+            </if>
+            <if test="dateStr !=null and dateStr != ''">
+                and date_format(appointmentTime,'%m%d%Y%H%i') = #{dateStr}
+            </if>
+        </where>
+    </select>
+    <select id="findHaveAppointmentTimes" resultType="com.hiveelpay.dal.dao.model.AppointmentDoc" useCache="true">
+        SELECT
+        <include refid="all_columns"/>
+        FROM
+        <include refid="table_name"/>
+        <where>
+            toStoreId = #{storeId}
+            <if test="statusSet !=null">
+                and appointmentStatus in (
+                <foreach collection="statusSet" item="item" separator=",">
+                    #{item}
+                </foreach>
+                )
+            </if>
+            <if test="dayStr!=null and dayStr !=''">
+                and str_to_date(#{dayStr},'%m%d%Y') = appointmentTime
+            </if>
+        </where>
+    </select>
+    <select id="findByAppointmentId" resultType="com.hiveelpay.dal.dao.model.AppointmentDoc" useCache="true">
+        SELECT
+        <include refid="all_columns"/>
+        FROM
+        <include refid="table_name"/>
+        <where>
+            appointmentId = #{appointmentId}
+        </where>
+    </select>
+    <select id="appointmentSearchCount" resultType="_int">
+        <bind name="keyword_pattern" value="'%'+searchRequest.keyWords + '%'"/>
+        select count(id)
+        from
+        <include refid="table_name"/>
+        <where>
+            1=1
+            <if test="searchRequest.mchId !=null and searchRequest.mchId !=''">
+                and toMchId = #{searchRequest.mchId}
+            </if>
+            <if test="searchRequest.storeId !=null and searchRequest.storeId !=''">
+                and toStoreId = #{searchRequest.storeId}
+            </if>
+            <if test="statusSet !=null">
+                and appointmentStatus in (
+                <foreach collection="statusSet" item="item" separator=",">
+                    #{item}
+                </foreach>
+                )
+            </if>
+            <if test="searchRequest.businessType !=null ">
+                and businessType = #{searchRequest.businessType}
+            </if>
+            <if test="searchRequest.tradeInType != null and searchRequest.tradeInType.val eq 1">
+                and (carMaxImgUrl is  null or carMaxImgUrl ='')
+            </if>
+            <if test="searchRequest.tradeInType != null and searchRequest.tradeInType.val eq 2">
+                and carMaxImgUrl is not null and  carMaxImgUrl !=''
+            </if>
+            <if test="searchRequest.keyWords !=null and searchRequest.keyWords !=''">
+                <![CDATA[      and (
+                appointmentId like #{keyword_pattern} or
+                firstName like #{keyword_pattern} or
+                lastName like #{keyword_pattern}
+                )
+                ]]>
+            </if>
+
+            <if test="searchRequest.startDateStr!= null and searchRequest.startDateStr !=''">
+                <![CDATA[   and appointmentTime >= str_to_date(#{searchRequest.startDateStr},'%m%d%Y')  ]]>
+            </if>
+            <if test="searchRequest.endDateStr!= null and searchRequest.endDateStr !=''">
+                <![CDATA[   and appointmentTime <= str_to_date(#{searchRequest.endDateStr} ,'%m%d%Y')  ]]>
+            </if>
+        </where>
+    </select>
+    <select id="appointmentSearch" resultType="com.hiveelpay.dal.dao.model.AppointmentDoc" useCache="true"
+            fetchSize="500">
+        <bind name="keyword_pattern" value="'%'+searchRequest.keyWords + '%'"/>
+        SELECT
+        <include refid="all_columns"/>
+        FROM
+        <include refid="table_name"/>
+        <where>
+            1=1
+            <if test="searchRequest.mchId !=null and searchRequest.mchId !=''">
+                and toMchId = #{searchRequest.mchId}
+            </if>
+            <if test="searchRequest.storeId !=null and searchRequest.storeId !=''">
+                and toStoreId = #{searchRequest.storeId}
+            </if>
+            <if test="statusSet !=null">
+                and appointmentStatus in (
+                <foreach collection="statusSet" item="item" separator=",">
+                    #{item}
+                </foreach>
+                )
+            </if>
+            <if test="searchRequest.businessType !=null ">
+                and businessType = #{searchRequest.businessType}
+            </if>
+            <if test="searchRequest.tradeInType != null and searchRequest.tradeInType.val eq 1">
+                and (carMaxImgUrl is null or carMaxImgUrl ='')
+            </if>
+            <if test="searchRequest.tradeInType != null and searchRequest.tradeInType.val eq 2">
+                and carMaxImgUrl is not null and  carMaxImgUrl !=''
+            </if>
+            <if test="searchRequest.keyWords !=null and searchRequest.keyWords !=''">
+                <![CDATA[      and (
+                appointmentId like #{keyword_pattern} or
+                firstName like #{keyword_pattern} or
+                lastName like #{keyword_pattern}
+                )
+                ]]>
+            </if>
+            <if test="searchRequest.startDateStr!= null and searchRequest.startDateStr !=''">
+                <![CDATA[   and appointmentTime >= str_to_date(#{searchRequest.startDateStr},'%m%d%Y')  ]]>
+            </if>
+            <if test="searchRequest.endDateStr!= null and searchRequest.endDateStr !=''">
+                <![CDATA[   and appointmentTime <= str_to_date(#{searchRequest.endDateStr} ,'%m%d%Y')  ]]>
+            </if>
+        </where>
+        order by appointmentTime desc , createAt desc
+        <if test="page !=null">
+            limit #{page.offset}, #{page.perPageSize}
+        </if>
+    </select>
+    <select id="findAppointmentsByInvoiceId" resultType="com.hiveelpay.dal.dao.model.AppointmentDoc" useCache="true">
+        select
+        <include refid="all_columns"/>
+        from
+        <include refid="table_name"/>
+        <where>
+            invoiceId = #{invoiceId}
+        </where>
+    </select>
+    <select id="findOneDayAppointments" resultType="com.hiveelpay.dal.dao.model.AppointmentDoc">
+        SELECT
+        <include refid="all_columns"/>
+        FROM
+        <include refid="table_name"/>
+        <where>
+            toMchId = #{mchId}
+            <if test="storeId!=null and storeId != ''">
+                and toStoreId = #{storeId}
+            </if>
+            and date_format(appointmentTime,'%m%Y') = #{dateStr}
+            <if test="dayStr !=null and dayStr!=''">
+                and date_format(appointmentTime,'%d') = #{dayStr}
+            </if>
+            <if test="statusSet!=null">
+                and appointmentStatus in (
+                <foreach collection="statusSet" item="item" separator=",">
+                    #{item}
+                </foreach>
+                )
+            </if>
+        </where>
+    </select>
+    <select id="searchByDaysLeave" resultType="com.hiveelpay.dal.dao.model.AppointmentDoc" useCache="false">
+        SELECT
+        <include refid="all_columns"/>
+        FRUOM
+        <include refid="table_name"/>
+        <where>
+            TIMESTAMPDIFF(day,now(),appointmentTime) =#{days} and appointmentStatus in (
+            <foreach collection="statusSet" item="item" separator=",">
+                #{item}
+            </foreach>
+            )
+        </where>
+    </select>
+    <select id="searchByHoursLeave" resultType="com.hiveelpay.dal.dao.model.AppointmentDoc" useCache="false">
+        SELECT
+        <include refid="all_columns"/>
+        FROM
+        <include refid="table_name"/>
+        <where>
+            TIMESTAMPDIFF(hour,now(),appointmentTime) =#{hours} and appointmentStatus in (
+            <foreach collection="statusSet" item="item" separator=",">
+                #{item}
+            </foreach>
+            )
+        </where>
+    </select>
+    <select id="countWithInvoiceId" resultType="int" useCache="true">
+        SELECT count(id) FROM
+        <include refid="table_name"/>
+        <where>
+            invoiceId = #{invoiceId}
+        </where>
+    </select>
+</mapper>

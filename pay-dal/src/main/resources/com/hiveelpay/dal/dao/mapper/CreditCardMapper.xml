@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hiveelpay.dal.dao.mapper.CreditCardMapper">
+    <sql id="table_name">
+        t_credit_card
+    </sql>
+    <sql id="all_columns">
+       <![CDATA[
+        id, token, customerId, addressId, billingAddressId, imageUrl, bin, cardType, issuingBank, cardholderName, last4, customerLocation, expirationMonth, expirationYear, isExpired, isDefault,
+        isVenmoSdk, commercial, debit, durbinRegulated, healthcare, payroll, prepaid, productId, countryOfIssuance, uniqueNumberIdentifier, createAt, lastUpdateAt
+        ]]>
+    </sql>
+    <sql id="save_columns">
+        <![CDATA[
+        token, customerId, addressId, billingAddressId, imageUrl, bin, cardType, issuingBank, cardholderName, last4, customerLocation, expirationMonth, expirationYear, isExpired, isDefault,
+        isVenmoSdk, commercial, debit, durbinRegulated, healthcare, payroll, prepaid, productId, countryOfIssuance, uniqueNumberIdentifier, createAt, lastUpdateAt
+        ]]>
+    </sql>
+    <insert id="save" parameterType="com.hiveelpay.dal.dao.model.CreditCard" flushCache="true">
+        insert into
+        <include refid="table_name"/>
+        (
+        <include refid="save_columns"/>
+        )
+        value
+        (
+        #{creditCard.token}, #{creditCard.customerId}, #{creditCard.addressId},#{creditCard.billingAddressId},
+        #{creditCard.imageUrl}, #{creditCard.bin}, #{creditCard.cardType},
+        #{creditCard.issuingBank}, #{creditCard.cardholderName}, #{creditCard.last4}, #{creditCard.customerLocation},
+        #{creditCard.expirationMonth}, #{creditCard.expirationYear}, #{creditCard.isExpired},
+        #{creditCard.isDefault},#{creditCard.isVenmoSdk}, #{creditCard.commercial}, #{creditCard.debit},
+        #{creditCard.durbinRegulated},
+        #{creditCard.healthcare}, #{creditCard.payroll}, #{creditCard.prepaid}, #{creditCard.productId},
+        #{creditCard.countryOfIssuance}, #{creditCard.uniqueNumberIdentifier}, #{creditCard.createAt},
+        #{creditCard.lastUpdateAt}
+        )
+    </insert>
+    <select id="findByToken" resultType="com.hiveelpay.dal.dao.model.CreditCard" useCache="true">
+        select
+        <include refid="all_columns"/>
+        from
+        <include refid="table_name"/>
+        <where>
+            token=#{token} and customerId=#{customerId}
+        </where>
+    </select>
+
+</mapper>

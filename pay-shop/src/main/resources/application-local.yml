@@ -1,0 +1,51 @@
+#---------------------------------#
+#      local configuration        #
+#---------------------------------#
+server:
+  port: 8081
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://172.168.1.6:3306/pay?useUnicode=true&characterEncoding=utf-8&autoReconnect=true&useSSL=false
+    username: root
+    password: root
+    hikari:
+      pool-name: pay_shop_local
+      minimum-idle: 5
+      maximum-pool-size: 20
+      connection-timeout: 300000
+      allow-pool-suspension: true
+      auto-commit: true
+      connection-test-query: select 1
+  thymeleaf:
+    encoding: UTF-8
+mybatis:
+  mapper-locations: "classpath:com/hiveelpay/shop/dao/mapper/*Mapper.xml"
+  type-handlers-package: com.hiveelpay.shop.dao.typehandlers
+  configuration:
+    cache-enabled: false
+    default-fetch-size: 500
+    default-enum-type-handler: org.apache.ibatis.type.EnumTypeHandler
+hiveel:
+  config:
+    payCenterServerUrl: http://172.168.1.6:3020
+    apiLoadAllProducts: /api/product/all
+    apiLoadMemberProducts: /api/product/${hiveel.config.pay.product.type.member}/list
+    apiAdvancingProducts: /api/product/${hiveel.config.pay.product.type.advancing}/list
+    apiAarOfDayProducts: /api/product/${hiveel.config.pay.product.type.carOfDay}/list
+    apiLoadSearchResultProducts: /api/product/${hiveel.config.pay.product.type.searchResult}/list
+    apiLoadhighlightingProducts: /api/product/${hiveel.config.pay.product.type.highlighting}/list
+    apiProductShow: /api/product/_productId_/show
+    apiPayToken: /api/pay/token
+    apiPayCheckout: /api/pay/checkout
+    pay:
+      product:
+        type:
+          member: 10
+          advancing: 12
+          carOfDay: 14
+          searchResult: 20
+          highlighting: 22
+logging:
+  file: /tmp/log/pay-shop.log
+debug: true

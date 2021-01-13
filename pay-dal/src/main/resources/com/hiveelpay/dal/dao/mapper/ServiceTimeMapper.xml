@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hiveelpay.dal.dao.mapper.ServiceTimeMapper">
+    <sql id="all_columns">
+        id, bizOrderNo, serviceStartTime, serviceEndTime, createAt, lastUpdateAt
+    </sql>
+    <sql id="save_columns">
+        bizOrderNo, serviceStartTime, serviceEndTime
+    </sql>
+    <sql id="table_name">
+        t_service_time
+    </sql>
+    <insert id="save" parameterType="com.hiveelpay.dal.dao.model.ServiceTime" flushCache="true">
+        insert into
+        <include refid="table_name"/>
+        (
+        <include refid="save_columns"/>
+        )
+        value
+        (
+        #{serviceTime.bizOrderNo},#{serviceTime.serviceStartTime},#{serviceTime.serviceEndTime}
+        )
+    </insert>
+    <insert id="saveMore">
+        insert into
+        <include refid="table_name"/>
+        (
+        <include refid="save_columns"/>
+        ) values
+        <foreach collection="serviceTimes" item="item" separator=",">
+            (#{item.bizOrderNo},#{item.serviceStartTime},#{item.serviceEndTime})
+        </foreach>
+    </insert>
+    <update id="updateServiceEndTimeToNow">
+        update
+        <include refid="table_name"/>
+        <set>
+            serviceEndTime = now()
+        </set>
+        <where>
+            bizOrderNo = #{bizOrderNo}
+        </where>
+    </update>
+    <update id="updateServiceEndTime">
+        update
+        <include refid="table_name"/>
+        <set>
+            serviceEndTime=#{now}
+        </set>
+        <where>
+            bizOrderNo=#{bizOrderNo}
+        </where>
+    </update>
+    <select id="queryByBizOrderNo" resultType="com.hiveelpay.dal.dao.model.ServiceTime" useCache="true">
+        select
+        <include refid="all_columns"/>
+        from
+        <include refid="table_name"/>
+        <where>
+            bizOrderNo =#{bizOrderNo}
+        </where>
+    </select>
+    <select id="queryByBizOrderNos" resultType="com.hiveelpay.dal.dao.model.ServiceTime" useCache="true">
+        select
+        <include refid="all_columns"/>
+        from
+        <include refid="table_name"/>
+        <where>
+            bizOrderNo in (
+            <foreach collection="bizOrderNoSet" item="item" separator=",">
+                #{item}
+            </foreach>
+            )
+        </where>
+    </select>
+</mapper>

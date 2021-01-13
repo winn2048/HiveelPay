@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hiveelpay.dal.dao.mapper.MchStoreInfoMapper">
+    <sql id="table_name">
+        t_mch_store_info
+    </sql>
+    <sql id="all_columns">
+        id, mchId, storeId, storeName, storePhone, emails, createAt, lastUpdateAt
+    </sql>
+    <sql id="save_columns">
+        mchId, storeId, storeName, storePhone, emails
+    </sql>
+    <insert id="save" parameterType="com.hiveelpay.dal.dao.model.MchStoreInfo" flushCache="true">
+        insert into
+        <include refid="table_name"/>
+        (
+        <include refid="save_columns"/>
+        ) value
+        (
+        #{mchStoreInfo.mchId},#{mchStoreInfo.storeId},#{mchStoreInfo.storeName},#{mchStoreInfo.storePhone},#{mchStoreInfo.emails}
+        )
+    </insert>
+    <select id="findByMchIdAndStoreId" resultType="com.hiveelpay.dal.dao.model.MchStoreInfo">
+        select
+        <include refid="all_columns"/>
+        from
+        <include refid="table_name"/>
+        <where>
+            mchId=#{mchId} and storeId=#{storeId}
+        </where>
+    </select>
+    <select id="findByMchId" resultType="com.hiveelpay.dal.dao.model.MchStoreInfo" useCache="true">
+        select
+        <include refid="all_columns"/>
+        from
+        <include refid="table_name"/>
+        <where>
+            mchId = #{mchId}
+        </where>
+    </select>
+</mapper>

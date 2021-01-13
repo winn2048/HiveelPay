@@ -1,0 +1,301 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta name="author" content="wilson"/>
+    <title>HiveelPay-shop</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="http://cdn.jsdelivr.net/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet"/>
+    <link th:href="@{/css/main.css}" rel="stylesheet"/>
+    <link rel="icon" type="image/x-icon" th:href="@{/favicon.ico}"/>
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="http://cdn.jsdelivr.net/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="http://cdn.jsdelivr.net/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+
+<!-- Begin page content -->
+<div class="container">
+    <div class="page-header">
+        <h1>HiveelPay shop 支付</h1>
+    </div>
+    <div class="main" align="left">
+        <div class="row">
+            <div class="inwrap">
+                <h3>产品</h3>
+                <div>
+                    <div> 产品ID <span th:text="${product.productId}"></span></div>
+                    <div> 产品名称 <span th:text="${product.productName}"></span></div>
+                    <div>描述 <span th:text="${product.productDescription}"></span></div>
+                    <div>价格 <span th:text="${product.amount}"></span></div>
+                    <div>productType <span th:text="${product.productType}"></span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+
+                <header>
+                    Hiveel test transaction.
+                </header>
+                <form id="payment-form" th:action="@{/shopping/doPay}" th:method="post">
+                    <label for="userId">
+                        <span class="input-label">userId</span>
+                        <div class="input-wrapper amount-wrapper">
+                            <input type="text" name="userId" id="userId" value="user001" size="50"/>
+                        </div>
+                    </label><br/>
+                    <label for="productId">
+                        <span class="input-label">productId</span>
+                        <div class="input-wrapper amount-wrapper">
+                            <input type="text" name="productId" id="productId" th:value="${product.productId}"
+                                   size="50"/>
+                        </div>
+                    </label><br/>
+                    <label for="accountType">
+                        <span class="input-label">accountType</span>
+                        <div class="input-wrapper amount-wrapper">
+                            <input type="text" name="accountType" id="accountType" value="DEALER" size="50"/>
+                            <i style="color: red"> CUSTOMER, DEALER</i>
+                        </div>
+                    </label><br/>
+                    <!--<label for="cardNumber">-->
+                    <!--<span class="input-label">cardNumber</span>-->
+                    <!--<div class="input-wrapper amount-wrapper">-->
+                    <!--<input type="text" name="cardNumber" id="cardNumber" value="4111111111111111" size="50"/>-->
+                    <!--</div>-->
+                    <!--</label><br/>-->
+                    <!--<label for="expirationDate">-->
+                    <!--<span class="input-label">expirationDate</span>-->
+                    <!--<div class="input-wrapper amount-wrapper">-->
+                    <!--<input type="text" name="expirationDate" id="expirationDate" value="02/19" size="50"/>-->
+                    <!--</div>-->
+                    <!--</label><br/>-->
+                    <!--<label for="securityCode">-->
+                    <!--<span class="input-label">securityCode(CVV)</span>-->
+                    <!--<div class="input-wrapper amount-wrapper">-->
+                    <!--<input type="text" name="securityCode" id="securityCode" value="100" size="50"/>-->
+                    <!--</div>-->
+                    <!--</label><br/>-->
+                    <label for="firstName">
+                        <span class="input-label">firstName</span>
+                        <div class="input-wrapper amount-wrapper">
+                            <input type="text" name="firstName" id="firstName" value="Wilson" size="50"/>
+                        </div>
+                    </label><br/>
+                    <label for="lastName">
+                        <span class="input-label">lastName</span>
+                        <div class="input-wrapper amount-wrapper">
+                            <input type="text" name="lastName" id="lastName" value="Scott" size="50"/>
+                        </div>
+                    </label><br/>
+                    <label for="addr">
+                        <span class="input-label">addr</span>
+                        <div class="input-wrapper amount-wrapper">
+                            <input type="text" name="addr" id="addr" value="addr" size="50"/>
+                        </div>
+                    </label><br/>
+                    <label for="city">
+                        <span class="input-label">city</span>
+                        <div class="input-wrapper amount-wrapper">
+                            <input type="text" name="city" id="city" value="city" size="50"/>
+                        </div>
+                    </label><br/>
+                    <label for="state">
+                        <span class="input-label">state</span>
+                        <div class="input-wrapper amount-wrapper">
+                            <input type="text" name="state" id="state" value="CA" size="50"/>
+                        </div>
+                    </label><br/>
+                    <label for="zipcode">
+                        <span class="input-label">zipcode</span>
+                        <div class="input-wrapper amount-wrapper">
+                            <input type="text" name="zipcode" id="zipcode" value="91748" size="50"/>
+                        </div>
+                    </label><br/>
+                    <label for="clientToken">
+                        <span class="input-label">clientToken</span>
+                        <div class="input-wrapper amount-wrapper">
+                            <textarea name="clientToken" id="clientToken" th:text="${token}" rows="10"
+                                      cols="50"></textarea>
+                            <i style="color: red">接口：/api/pay/token</i>
+                        </div>
+                    </label><br/>
+
+
+                    <label for="paymentMethodId">
+                        <span class="input-label">paymentMethodId</span>
+                        <div class="input-wrapper amount-wrapper">
+                            <input type="text" id="paymentMethodId" name="paymentMethodId" size="50"/>
+                        </div>
+                    </label><br/>
+
+
+                    <label for="mchId">
+                        <span class="input-label">mchId</span>
+                        <div class="input-wrapper amount-wrapper">
+                            <select id="mchId" name="mchId">
+                                <option value="10000000">hiveel</option>
+                                <option value="10000001">On-Site Automotive Services</option>
+                                <option value="10000002">tradeinsolutions</option>
+                            </select>
+                        </div>
+                    </label><br/>
+                    <!--<label for="carIds">-->
+                    <!--<span class="input-label">carIds</span>-->
+                    <!--<div class="input-wrapper amount-wrapper">-->
+                    <!--<input type="text" id="carIds" name="carIds" value="123" size="50"/><i-->
+                    <!--style="color:red">车的ID,多个车ID用英文','分隔</i>-->
+                    <!--</div>-->
+                    <!--</label><br/>-->
+
+
+                    <!--<label for="channelId">-->
+                    <!--<span class="input-label">channelId</span>-->
+                    <!--<div class="input-wrapper amount-wrapper">-->
+                    <!--<input type="text" id="channelId" name="channelId" value="H_SUBSCRIPTION" size="50"/>-->
+                    <!--<i style="color:red">固定值</i>-->
+                    <!--</div>-->
+                    <!--</label><br/>-->
+
+
+                    <section>
+                        <label for="amount">
+                            <span class="input-label">Amount</span>
+                            <div class="input-wrapper amount-wrapper">
+                                <input size="50" id="amount" name="totalAmount" type="tel" min="1" placeholder="Amount"
+                                       th:value="${product.amount}"/>
+                            </div>
+                        </label>
+                        <div class="bt-drop-in-wrapper">
+                            <div id="bt-dropin"></div>
+                        </div>
+                    </section>
+                    <br/>
+                    <section>
+                        <label for="serviceTimes">
+                            <span class="input-label">产品有效开始时间</span>
+                            <div class="input-wrapper amount-wrapper">
+                                <input size="1000" id="serviceTimes" name="serviceTimes" type="tel" min="1"
+                                       placeholder="MMddyyyyHHmm" value=""/><i style="color: red">格式:'MMddyyyyHHmm,MMddyyyyHHmm;',<br/>'开始时间1,结束时间1;开始时间2,结束时间2;'，多个值用英文分号分隔,</i>
+                            </div>
+                        </label>
+
+                    </section>
+                    <br/>
+                    <section>
+                        <label for="docId">
+                            <span class="input-label">关联的文档ID </span>
+                            <div class="input-wrapper amount-wrapper">
+                                <input size="50" id="docId" name="docId" type="tel" min="1"
+                                       placeholder="docId" value=""/><i style="color: red">关联的文档ID，比如：appointmentId,car-of-day
+                                的车的ID</i>
+                            </div>
+                        </label>
+
+                    </section>
+                    <br/>
+                    <label for="docZipcode">
+                        <span class="input-label">docZipcode</span>
+                        <div class="input-wrapper amount-wrapper">
+                            <input type="text" id="docZipcode" name="docZipcode" size="50" value="91748"/><i style="color: red">关联的文档ID的zipCode，比如：car-of-day
+                            用户选择的zipcode</i>
+                        </div>
+                    </label>
+                    <br/>
+                    <label for="nonce">
+                        <span class="input-label">nonce</span>
+                        <div class="input-wrapper amount-wrapper">
+                            <input type="text" id="nonce" name="nonce" size="50"/>
+                        </div>
+                    </label>
+                    <label for="billedMethod">
+                        <span class="input-label">billedMethod</span>
+                        <div class="input-wrapper amount-wrapper">
+                            <input type="text" id="billedMethod" name="billedMethod" th:value="${product.billedMethod}"
+                                   size="50"/>
+                        </div>
+                    </label>
+
+                    <button id="btnNonce" name="btnNonce" class="button" type="button"><span>Get Nonce</span></button>
+                    <button id="submit" name="submit" class="button" type="submit"><span>Test Transaction</span>
+                    </button>
+                </form>
+            </div>
+            <div>
+                <a th:href="@{/}">重选产品</a>
+            </div>
+        </div>
+
+        <script src="https://js.braintreegateway.com/web/dropin/1.11.0/js/dropin.min.js"></script>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            var form = document.querySelector('#payment-form');
+            var btnNonce = document.querySelector('#btnNonce');
+            var client_token = [[${token}]];
+            console.log("client_token:", client_token);
+
+            braintree.dropin.create({
+                authorization: client_token,
+                // authorization: 'sandbox_g42y39zw_348pk9cgf3bgyw2b',
+                container: '#bt-dropin',
+                paypal: {
+                    flow: 'vault'
+                }
+            }, function (createErr, instance) {
+
+                btnNonce.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    instance.requestPaymentMethod(function (err, payload) {
+                        if (err) {
+                            console.log('Error', err);
+                            return;
+                        }
+                        document.querySelector('#nonce').value = payload.nonce;
+                    });
+                });
+
+                // form.addEventListener('submit', function (event) {
+                //     event.preventDefault();
+                //
+                //     // instance.requestPaymentMethod(function (err, payload) {
+                //     //     if (err) {
+                //     //         console.log('Error', err);
+                //     //         return;
+                //     //     }
+                //     //
+                //     //     // Add the nonce to the form and submit
+                //     //     document.querySelector('#nonce').value = payload.nonce;
+                //     //
+                //     //     // document.querySelector('#cardNumber').value = document.querySelector('#credit-card-number').value;
+                //     //     // document.querySelector('#expirationDate').value = document.querySelector('#expiration').value;
+                //     //     // document.querySelector('#securityCode').value = document.querySelector('#cvv').value;
+                //     //
+                //     //
+                //     // });
+                //     form.submit();
+                // });
+            });
+            /*]]>*/
+        </script>
+
+    </div>
+
+
+    <footer class="footer">
+        <div class="container">
+            <p class="text-muted">&copy;2018 HiveelPay</p>
+        </div>
+    </footer>
+
+
+</div>
+</body>
+</html>

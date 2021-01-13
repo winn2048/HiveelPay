@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hiveelpay.dal.dao.mapper.AddressMapper">
+    <sql id="table_name">
+        t_address
+    </sql>
+    <sql id="all_columns">
+        id, addressId, customerId, firstName, lastName, company, addressType, streetAddress, locality, region, postalCode, countryCodeAlpha2,
+        countryCodeAlpha3, countryCodeNumeric, countryName, extendedAddress, syncStatus, targetId, createAt, lastUpdateAt
+    </sql>
+    <sql id="save_columns">
+        addressId, customerId, firstName, lastName, company, addressType, streetAddress,
+        locality, region, postalCode, countryCodeAlpha2, countryCodeAlpha3, countryCodeNumeric, countryName, extendedAddress, targetId
+    </sql>
+
+    <insert id="save" parameterType="com.hiveelpay.dal.dao.model.Address" flushCache="true">
+        insert into
+        <include refid="table_name"/>
+        (
+        <include refid="save_columns"/>
+        )
+        value
+        (
+        #{address.addressId},#{address.customerId},#{address.firstName},#{address.lastName},#{address.company},#{address.addressType},#{address.streetAddress},
+        #{address.locality},#{address.region},#{address.postalCode},#{address.countryCodeAlpha2},#{address.countryCodeAlpha3},#{address.countryCodeNumeric},
+        #{address.countryName},#{address.extendedAddress},#{address.targetId}
+        )
+    </insert>
+    <update id="update" parameterType="com.hiveelpay.dal.dao.model.Address" flushCache="true">
+        update
+        <include refid="table_name"/>
+        <set>
+            <if test="addr.firstName !=null">
+                firstName = #{addr.firstName},
+            </if>
+            <if test="addr.lastName !=null">
+                lastName = #{addr.lastName},
+            </if>
+            <if test="addr.company !=null">
+                company = #{addr.company},
+            </if>
+            <if test="addr.addressType !=null">
+                addressType = #{addr.addressType},
+            </if>
+            <if test="addr.streetAddress !=null">
+                streetAddress = #{addr.streetAddress},
+            </if>
+            <if test="addr.locality !=null">
+                locality = #{addr.locality},
+            </if>
+            <if test="addr.region !=null">
+                region = #{addr.region},
+            </if>
+            <if test="addr.postalCode !=null">
+                postalCode = #{addr.postalCode},
+            </if>
+            <if test="addr.postalCode !=null">
+                countryCodeAlpha2 = #{addr.countryCodeAlpha2},
+            </if>
+            <if test="addr.countryCodeAlpha3 !=null">
+                countryCodeAlpha3 = #{addr.countryCodeAlpha3},
+            </if>
+            <if test="addr.countryCodeNumeric !=null">
+                countryCodeNumeric = #{addr.countryCodeNumeric},
+            </if>
+            <if test="addr.countryName !=null">
+                countryName = #{addr.countryName},
+            </if>
+            <if test="addr.extendedAddress !=null">
+                extendedAddress = #{addr.extendedAddress},
+            </if>
+            <if test="addr.syncStatus !=null">
+                syncStatus = #{addr.syncStatus},
+            </if>
+            <if test="addr.targetId !=null">
+                targetId = #{addr.targetId}
+            </if>
+        </set>
+        <where>
+            addressId=#{addr.addressId}
+            <if test="addr.customerId!=null">
+                and customerId = #{addr.customerId}
+            </if>
+        </where>
+    </update>
+    <select id="findAddressByAddressId" resultType="com.hiveelpay.dal.dao.model.Address" useCache="true">
+        select
+        <include refid="all_columns"/>
+        from
+        <include refid="table_name"/>
+        <where>
+            addressId = #{addressId}
+        </where>
+    </select>
+
+    <select id="findSaveAddress" resultType="com.hiveelpay.dal.dao.model.Address" useCache="true">
+        select
+        <include refid="all_columns"/>
+        from
+        <include refid="table_name"/>
+        <where>
+            customerId=#{address.customerId}
+            and addressType=#{addressType}
+            and firstName=#{address.firstName}
+            and lastName = #{address.lastName}
+            and streetAddress=#{address.streetAddress}
+            and locality=#{address.locality}
+            and postalCode=#{address.postalCode}
+        </where>
+    </select>
+</mapper>

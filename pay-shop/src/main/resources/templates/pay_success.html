@@ -1,0 +1,51 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta name="author" content="wilson"/>
+    <title>HiveelPay-shop</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="http://cdn.jsdelivr.net/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet"/>
+    <link th:href="@{/css/main.css}" rel="stylesheet"/>
+    <link rel="icon" type="image/x-icon" th:href="@{/favicon.ico}"/>
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="http://cdn.jsdelivr.net/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="http://cdn.jsdelivr.net/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+
+<!-- Begin page content -->
+<div class="container">
+    <div class="page-header">
+        <h1>HiveelPay shop</h1>
+    </div>
+    <div class="main" align="center">
+        <div class="inwrap">
+            <h3>Pay success!</h3>
+            code: <span th:text="${response.code}"></span><br/>
+            msg: <span th:text="${response.msg}"></span><br/>
+            data: <span th:text="${response.data}"></span><br/>
+
+
+        </div>
+        <div>
+            <a th:href="@{/}">再支付一笔</a>
+        </div>
+    </div>
+</div>
+
+<footer class="footer">
+    <div class="container">
+        <p class="text-muted">&copy;2018 HiveelPay</p>
+    </div>
+</footer>
+
+
+</body>
+</html>

@@ -1,0 +1,53 @@
+#---------------------------------#
+#      hiveelco configuration     #
+#---------------------------------#
+server:
+  port: 8092
+spring:
+  freemarker:
+    enabled: true
+    cache: false
+    charset: UTF-8
+    check-template-location: true
+    content-type: text/html
+    expose-request-attributes: true
+    expose-session-attributes: true
+    request-context-attribute: request
+  mvc:
+    favicon:
+      enabled: false
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://23.228.71.18:3306/pay?useUnicode=true&characterEncoding=utf-8&autoReconnect=true&useSSL=false
+    username: mysql
+    password: mysql@Hivee1
+    hikari:
+      pool-name: pay_mgr_hiveelco
+      minimum-idle: 5
+      maximum-pool-size: 20
+      connection-timeout: 300000
+      allow-pool-suspension: true
+      auto-commit: true
+      connection-test-query: select 1
+mybatis:
+  mapper-locations: "classpath:com/hiveelpay/dal/dao/mapper/*Mapper.xml"
+  type-handlers-package: com.hiveelpay.dal.dao.typehandlers
+  configuration:
+    cache-enabled: false
+    default-fetch-size: 500
+    default-enum-type-handler: org.apache.ibatis.type.EnumTypeHandler
+hiveel:
+  username: hiveel
+  password: mgr@Hivee1
+config:
+  email:
+    switchOn: false
+    openCC: false
+    api: "http://23.228.71.18:8080/hiveel3/api/email"
+    errorApi: "http://23.228.71.18:8080/hiveel3/api/error/email"
+    apiKey: "hiveel"
+    appointmentViewUrl: "http://23.228.71.18:8080/account/order/_bizType_/_appointmentId_"
+logging:
+  file: /tmp/log/pay-mgr.log
+  config: classpath:logback-spring.xml
+debug: true

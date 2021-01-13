@@ -1,0 +1,78 @@
+#---------------------------------#
+#      local configuration        #
+#---------------------------------#
+server:
+  port: 3020
+spring:
+  profiles:
+    include:
+    - activeMQ
+    #- rabbitMQ # 需要安装延迟队列插件：https://www.rabbitmq.com/blog/2015/04/16/scheduling-messages-with-rabbitmq/
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://172.168.1.6:3306/pay?useUnicode=true&characterEncoding=utf-8&autoReconnect=true&useSSL=false
+    #&serverTimezone=America/Los_Angeles
+    username: root
+    password: root
+    hikari:
+      pool-name: hiveelpay_local
+      minimum-idle: 5
+      maximum-pool-size: 20
+      connection-timeout: 300000
+      allow-pool-suspension: true
+      auto-commit: true
+      connection-test-query: select 1
+  activemq:
+    broker-url: failover:(tcp://23.228.71.18:61616?wireFormat.maxInactivityDuration=0)
+    in-memory: true
+    pool:
+      enabled: true # 如果此处设置为true，需要加activemq-pool依赖包，否则会自动配置失败，报JmsMessagingTemplate注入失败
+  rabbitmq:
+    addresses: 23.228.71.18:5672
+    username: guest
+    password: guest
+    dynamic: true
+  thymeleaf:
+    encoding: UTF-8
+  devtools:
+    restart:
+      enabled: true
+  jackson:
+    date-format: "MMddyyyyHHmmss"
+mybatis:
+  mapper-locations: "classpath:com/hiveelpay/dal/dao/mapper/*Mapper.xml"
+  type-handlers-package: com.hiveelpay.dal.dao.typehandlers
+  configuration:
+    cache-enabled: false
+    default-fetch-size: 500
+    default-enum-type-handler: org.apache.ibatis.type.EnumTypeHandler
+config:
+  ali:
+    notify_url: http://api.pay.org/notify/pay/aliPayNotifyRes.htm
+    return_url: http://pay.hiveel.com
+  wx:
+    certRootPath: /home/pay/service/cert
+    notifyUrl: http://api.pay.org/notify/pay/wxPayNotifyRes.htm
+  hiveel:
+    pay-server-base-url: "http://172.168.1.6:3020/api"
+  search:
+    carUpdate: "http://172.168.1.6:8090/car/update/service/_carId"
+  auth:
+    #调用getUsers查询用户
+    apiUserInfo: "http://23.228.71.18:5555/auth/getUsers?ids="
+  email:
+    switchOn: true
+    api: "http://23.228.71.18:8080/hiveel3/api/email"
+    errorApi: "http://23.228.71.18:8080/hiveel3/api/error/email"
+    apiKey: "hiveel"
+    appointmentViewUrl: "http://172.168.1.6:8080/account/order/_bizType_/_appointmentId_"
+  braintree:
+    btEnvironment: "sandbox"
+    btMerchantId: "hdkfsz2tnsx7tq9s"
+    btPublicKey: "4mw23fj89g9n3z3h"
+    btPrivateKey: "25d93abdec90d31701b6d3edd00d5b0b"
+  admin:
+    contacts: "Wilson:9099908811,"
+logging:
+  file: /tmp/log/hiveelpay.log
+debug: true

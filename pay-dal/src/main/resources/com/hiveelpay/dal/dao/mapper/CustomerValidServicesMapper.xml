@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hiveelpay.dal.dao.mapper.CustomerValidServicesMapper">
+    <sql id="table_name">
+        t_customer_valid_services
+    </sql>
+    <sql id="all_columns">
+        id,
+        customerId, serviceId, productId, bizOrderNo, serviceName, serviceType, serviceStatus, startTime, endTime,
+        createAt, lastUpdateAt
+    </sql>
+    <sql id="save_columns">
+        customerId, serviceId, productId, bizOrderNo, serviceName, serviceType, serviceStatus, startTime, endTime
+    </sql>
+
+    <insert id="save" parameterType="com.hiveelpay.dal.dao.model.CustomerValidServices" flushCache="true">
+        INSERT INTO
+        <include refid="table_name"/>
+        (
+        <include refid="save_columns"/>
+        )
+        VALUE
+        (
+        #{cvs.customerId}, #{cvs.serviceId},#{cvs.productId},#{cvs.bizOrderNo}, #{cvs.serviceName}, #{cvs.serviceType},
+        #{cvs.serviceStatus},
+        #{cvs.startTime}, #{cvs.endTime}
+        )
+    </insert>
+    <insert id="saveMore" parameterType="com.hiveelpay.dal.dao.model.CustomerValidServices" flushCache="true">
+        INSERT INTO
+        <include refid="table_name"/>
+        (
+        <include refid="save_columns"/>
+        )
+        VALUES
+        <foreach collection="cvss" separator="," item="cvs">
+            (
+            #{cvs.customerId}, #{cvs.serviceId},#{cvs.productId},#{cvs.bizOrderNo}, #{cvs.serviceName},
+            #{cvs.serviceType},
+            #{cvs.serviceStatus},
+            #{cvs.startTime}, #{cvs.endTime}
+            )
+        </foreach>
+
+    </insert>
+    <update id="updateStatus">
+        update
+        <include refid="table_name"/>
+        <set>
+            serviceStatus = #{serviceStatus}
+        </set>
+        <where>
+            customerId = #{bizOrder.customerId} and productId = #{bizOrder.productId} and bizOrderNo =
+            #{bizOrder.bizOrderNo} and serviceName = #{payProduct.productName} and serviceType =
+            #{payProduct.productType} and startTime = #{bizOrder.serviceTimes}
+        </where>
+    </update>
+    <update id="updateStatusByServiceId">
+        update
+        <include refid="table_name"/>
+        <set>
+            serviceStatus = #{toStatus}
+        </set>
+        <where>
+            serviceId = #{serviceId} and serviceStatus = #{fromStatus}
+        </where>
+    </update>
+    <update id="updateServiceEndTime">
+        update
+        <include refid="table_name"/>
+        <set>
+            endTime=#{now}
+        </set>
+        <where>
+            bizOrderNo =#{bizOrderNo}
+        </where>
+    </update>
+    <update id="cancelServiceByBizOrderNo">
+        update
+        <include refid="table_name"/>
+        <set>
+            serviceStatus = #{toStatus}
+        </set>
+        <where>
+            bizOrderNo=#{bizOrderNo} and serviceStatus in (
+            <foreach collection="fromStatusSet" item="item" separator=",">
+                #{item}
+            </foreach>
+            )
+        </where>
+    </update>
+    <delete id="deleteValidService">
+        DELETE FROM
+        <include refid="table_name"/>
+        <where>
+            bizOrderNo IN (
+            <foreach collection="serviceEndBizOrderNoList" item="item" separator=",">
+                #{item}
+            </foreach>
+            )
+        </where>
+    </delete>
+    <select id="findByCustomerId" resultType="com.hiveelpay.dal.dao.model.CustomerValidServices" useCache="false">
+        select
+        <include refid="all_columns"/>
+        from
+        <include refid="table_name"/>
+        <where>
+            customerId = #{customerId}
+            <if test="serviceType !=null ">
+                and serviceType = #{serviceType}
+            </if>
+            <if test="statusEnumSet!=null">
+                and serviceStatus in (
+                <foreach collection="statusEnumSet" item="item" separator=",">
+                    #{item}
+                </foreach>
+                )
+            </if>
+        </where>
+        order by createAt DESC
+    </select>
+    <select id="findByBizOrderNo" resultType="com.hiveelpay.dal.dao.model.CustomerValidServices">
+        select
+        <include refid="all_columns"/>
+        from
+        <include refid="table_name"/>
+        <where>
+            bizOrderNo = #{bizOrderNo}
+        </where>
+        order by createAt ASC
+    </select>
+    <select id="findWillStartServices" resultType="com.hiveelpay.dal.dao.model.CustomerValidServices" useCache="false">
+        select
+        <include refid="all_columns"/>
+        from
+        <include refid="table_name"/>
+        <where>
+            <![CDATA[  serviceStatus = #{serviceStatus} and startTime<=now() ]]>
+        </where>
+        order by createAt ASC
+    </select>
+    <select id="findWillEndServices" resultType="com.hiveelpay.dal.dao.model.CustomerValidServices">
+        select
+        <include refid="all_columns"/>
+        from
+        <include refid="table_name"/>
+        <where>
+            <![CDATA[  serviceStatus = #{serviceStatus} and  endTime <= now()]]>
+        </where>
+        order by createAt ASC
+    </select>
+    <select id="findValidServices" resultType="com.hiveelpay.dal.dao.model.CustomerValidServices" useCache="false">
+        select
+        <include refid="all_columns"/>
+        from
+        <include refid="table_name"/>
+        <where>
+            serviceStatus = #{serviceStatus}
+            and bizOrderNo in (
+            <foreach collection="bizOrderIdSet" item="item" separator=",">
+                #{item}
+            </foreach>
+            )
+        </where>
+    </select>
+    <select id="findByStatusAndPayProductTypes" resultType="com.hiveelpay.dal.dao.model.CustomerValidServices"
+            useCache="true">
+        select
+        <include refid="all_columns"/>
+        from
+        <include refid="table_name"/>
+        <where>
+            serviceStatus in
+            (
+            <foreach collection="statusEnumSet" item="status" separator=",">
+                #{status}
+            </foreach>
+
+            ) and serviceType in
+            (
+            <foreach collection="types" item="type" separator=",">
+                #{type}
+            </foreach>
+            )
+        </where>
+    </select>
+    <select id="findByBizOrderNoAndServiceType" resultType="com.hiveelpay.dal.dao.model.CustomerValidServices"
+            useCache="true">
+        select
+        <include refid="all_columns"/>
+        from
+        <include refid="table_name"/>
+        <where>
+            bizOrderNo = #{bizOrderNo} and serviceType = #{productType} order by createAt desc limit 1
+        </where>
+    </select>
+
+</mapper>

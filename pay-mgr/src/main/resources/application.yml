@@ -1,0 +1,8 @@
+#---------------------------------#
+#        General configuration    #
+#---------------------------------#
+spring:
+  profiles:
+    active: prod
+  application:
+    name: hiveelpaymgr
